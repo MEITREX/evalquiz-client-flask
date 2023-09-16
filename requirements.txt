@@ -1,0 +1,11 @@
+betterproto==2.0.0b6
+flask[async]
+asyncio
+grpclib
+mypy
+pymongo
+pytest
+wtforms
+black
+jsonpickle
+blake3
