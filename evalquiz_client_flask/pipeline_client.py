@@ -21,4 +21,6 @@ class PipelineClient:
         async for pipeline_status in self.service.iterate_config(InternalConfig()):
             print(pipeline_status)
             last_pipeline_status = pipeline_status
-        return last_pipeline_status
+        if last_pipeline_status is not None and isinstance(last_pipeline_status.result, InternalConfig):
+            return last_pipeline_status.result
+        return internal_config

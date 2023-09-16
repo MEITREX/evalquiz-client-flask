@@ -1,14 +1,13 @@
-import asyncio
-import os
 from pathlib import Path
 from flask import redirect, Flask, request, url_for
 from flask.typing import ResponseReturnValue
+from markupsafe import escape
 from werkzeug.utils import secure_filename
 
 from evalquiz_client_flask.material_client import MaterialClient
 from evalquiz_client_flask.pipeline_client import PipelineClient
 from evalquiz_proto.shared.exceptions import MimetypeNotDetectedException
-from evalquiz_proto.shared.generated import Metadata
+from evalquiz_proto.shared.generated import InternalConfig, Metadata
 from evalquiz_proto.shared.mimetype_resolver import MimetypeResolver
 
 app = Flask(__name__)
@@ -17,7 +16,7 @@ pipeline_client = PipelineClient()
 
 
 @app.route("/api/get_material_hash_name_pairs")
-async def get_material_hash_name_pairs():
+async def get_material_hash_name_pairs() -> ResponseReturnValue:
     return await material_client.get_material_hash_name_pairs()
 
 
@@ -38,11 +37,14 @@ async def upload_material() -> ResponseReturnValue:
     return redirect(url_for("index"))
 
 
-@app.route("/api/delete_material/<hash>", methods=["GET", "POST"])
-async def delete_material() -> ResponseReturnValue:
-    await material_client.delete_material(hash)
+app.route("/api/delete_config/<hash_value>")
+async def delete_material() -> None:
+    await material_client.delete_material(hash_value)
 
 
 @app.route("/api/iterate_config", methods=["POST"])
 async def iterate_config() -> ResponseReturnValue:
-    pipeline_statuses = await pipeline_client.iterate_config()
+    internal_config = InternalConfig()
+    iterated_internal_config = await pipeline_client.iterate_config(internal_config)
+    iterated_internal_config_json = iterated_internal_config.to_json()
+    return iterated_internal_config_json

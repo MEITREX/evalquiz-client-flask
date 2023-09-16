@@ -33,7 +33,7 @@ class MaterialClient:
     async def delete_material(self, hash: str) -> None:
         channel = Channel(host=self.host, port=self.port)
         service = MaterialServerStub(channel)
-        await service.delete_material(hash)
+        await service.delete_material(String(hash))
         channel.close()
 
     async def get_material_hash_name_pairs(self) -> list[tuple[str, str]]:
