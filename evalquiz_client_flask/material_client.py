@@ -30,6 +30,12 @@ class MaterialClient:
         await service.upload_material(material_upload_data)
         channel.close()
 
+    async def delete_material(self, hash: str) -> None:
+        channel = Channel(host=self.host, port=self.port)
+        service = MaterialServerStub(channel)
+        await service.delete_material(hash)
+        channel.close()
+
     async def get_material_hash_name_pairs(self) -> list[tuple[str, str]]:
         channel = Channel(host=self.host, port=self.port)
         service = MaterialServerStub(channel)

@@ -1,9 +1,8 @@
 import asyncio
 import os
 from pathlib import Path
-from flask import redirect, render_template, Flask, request, flash, url_for
+from flask import redirect, Flask, request, url_for
 from flask.typing import ResponseReturnValue
-from evalquiz_client_flask.forms import InternalConfigForm
 from werkzeug.utils import secure_filename
 
 from evalquiz_client_flask.material_client import MaterialClient
@@ -13,21 +12,16 @@ from evalquiz_proto.shared.generated import Metadata
 from evalquiz_proto.shared.mimetype_resolver import MimetypeResolver
 
 app = Flask(__name__)
-
 material_client = MaterialClient()
+pipeline_client = PipelineClient()
 
 
-@app.route("/")
-async def index() -> ResponseReturnValue:
-    material_hash_name_pairs = await material_client.get_material_hash_name_pairs()
-    return render_template(
-        "index.html",
-        form=InternalConfigForm(),
-        material_hash_name_pairs=material_hash_name_pairs,
-    )
+@app.route("/api/get_material_hash_name_pairs")
+async def get_material_hash_name_pairs():
+    return await material_client.get_material_hash_name_pairs()
 
 
-@app.route("/upload_material", methods=["GET", "POST"])
+@app.route("/api/upload_material", methods=["POST"])
 async def upload_material() -> ResponseReturnValue:
     if request.method == "POST":
         material = request.files["material"]
@@ -44,11 +38,11 @@ async def upload_material() -> ResponseReturnValue:
     return redirect(url_for("index"))
 
 
-@app.route("/iterate_config", methods=["GET", "POST"])
-def register() -> ResponseReturnValue:
-    form = InternalConfigForm(request.form) or InternalConfigForm()
-    if request.method == "POST" and form.validate():
-        # Do something with form information.
-        flash("Thanks for registering")
-        # Update form
-    return render_template("index.html", form=form)
+@app.route("/api/delete_material/<hash>", methods=["GET", "POST"])
+async def delete_material() -> ResponseReturnValue:
+    await material_client.delete_material(hash)
+
+
+@app.route("/api/iterate_config", methods=["POST"])
+async def iterate_config() -> ResponseReturnValue:
+    pipeline_statuses = await pipeline_client.iterate_config()
