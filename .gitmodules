@@ -1,3 +1,6 @@
 [submodule "evalquiz_proto"]
 	path = evalquiz_proto
 	url = git@github.com:MEITREX/evalquiz-proto.git
+[submodule "evalquiz-client-react"]
+	path = evalquiz-client-react
+	url = git@github.com:MEITREX/evalquiz-client-react.git

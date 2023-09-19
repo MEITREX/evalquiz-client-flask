@@ -36,16 +36,16 @@ class MaterialClient:
         await service.delete_material(String(hash))
         channel.close()
 
-    async def get_material_hash_name_pairs(self) -> list[tuple[str, str]]:
+    async def get_material_name_hash_pairs(self) -> list[dict[str, str]]:
         channel = Channel(host=self.host, port=self.port)
         service = MaterialServerStub(channel)
         hashes = await service.get_material_hashes(Empty())
-        hash_name_pairs: list[tuple[str, str]] = []
+        name_hash_pairs: list[dict[str, str]] = []
         for hash in hashes.values:
             name = await service.get_material_name(String(hash))
-            hash_name_pairs.append((hash, name.value))
+            name_hash_pairs.append({"name": name.value, "hash": hash})
         channel.close()
-        return hash_name_pairs
+        return name_hash_pairs
 
 
 async def main() -> None:

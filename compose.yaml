@@ -2,7 +2,13 @@ services:
   app:
     build:
       context: .
+  frontend:
+    build:
+      context: evalquiz-client-react/.
+    environment:
+      - REACT_APP_BACKEND_URL=http://localhost:5000
+    command: npm start
+    depends_on:
+      - app
     ports:
-      - 5000:5000
-    extra_hosts:
-      - host.docker.internal:host-gateway
+      - 3000:3000
