@@ -14,7 +14,10 @@ from evalquiz_proto.shared.mimetype_resolver import MimetypeResolver
 
 app = Flask(__name__)
 cors = CORS(app)
-app.config['CORS_HEADERS'] = 'Content-Type'
+app.config["CORS_HEADERS"] = "Content-Type"
+
+if __name__ == "__main__":
+    app.run()
 
 material_client = MaterialClient()
 pipeline_client = PipelineClient()
@@ -51,9 +54,13 @@ async def iterate_config() -> ResponseReturnValue:
     config = request.json["config"]
     config_json = json.dumps(config)
     internal_config = InternalConfig().from_json(config_json)
-    material_server_url = "evalquiz-material-server-app-1" + ":" + str(material_client.port)
-    internal_config.material_server_urls.append(material_server_url)
+    material_server_url = (
+        "evalquiz-material-server-app-1" + ":" + str(material_client.port)
+    )
+    internal_config.material_server_urls[0] = material_server_url
     print(internal_config)
     iterated_internal_config = await pipeline_client.iterate_config(internal_config)
-    iterated_internal_config_json = iterated_internal_config.to_json(include_default_values=True, casing=Casing.SNAKE)
+    iterated_internal_config_json = iterated_internal_config.to_json(
+        include_default_values=True, casing=Casing.SNAKE
+    )
     return iterated_internal_config_json
