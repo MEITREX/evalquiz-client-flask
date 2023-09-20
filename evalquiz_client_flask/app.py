@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 from flask import Flask, request
 from flask.typing import ResponseReturnValue
-from flask_cors import CORS, cross_origin
+from flask_cors import CORS
 from werkzeug.utils import secure_filename
 from betterproto import Casing
 
@@ -29,7 +29,7 @@ async def get_material_name_hash_pairs() -> ResponseReturnValue:
 
 
 @app.route("/api/upload_material", methods=["POST"])
-async def upload_material() -> None:
+async def upload_material() -> ResponseReturnValue:
     if request.method == "POST":
         material = request.files["material"]
         if material.filename is not None:
@@ -42,11 +42,13 @@ async def upload_material() -> None:
             name = request.form["name"]
             metadata = Metadata(mimetype, name)
             await material_client.upload_material(metadata, Path(local_path))
+    return "Success"
 
 
 @app.route("/api/delete_material/<hash>")
-async def delete_material(hash: str) -> None:
+async def delete_material(hash: str) -> ResponseReturnValue:
     await material_client.delete_material(hash)
+    return "Success"
 
 
 @app.route("/api/iterate_config", methods=["POST"])
@@ -54,13 +56,20 @@ async def iterate_config() -> ResponseReturnValue:
     config = request.json["config"]
     config_json = json.dumps(config)
     internal_config = InternalConfig().from_json(config_json)
-    material_server_url = (
-        "evalquiz-material-server-app-1" + ":" + str(material_client.port)
+    internal_config.material_server_urls = _add_material_server_url(
+        internal_config.material_server_urls
     )
-    internal_config.material_server_urls[0] = material_server_url
-    print(internal_config)
     iterated_internal_config = await pipeline_client.iterate_config(internal_config)
     iterated_internal_config_json = iterated_internal_config.to_json(
         include_default_values=True, casing=Casing.SNAKE
     )
     return iterated_internal_config_json
+
+
+def _add_material_server_url(material_server_urls: list[str]) -> list[str]:
+    material_server_url = str(material_client.host) + ":" + str(material_client.port)
+    if len(material_server_urls) == 0:
+        material_server_urls.append(material_server_url)
+    else:
+        material_server_urls[0] = material_server_url
+    return material_server_urls
