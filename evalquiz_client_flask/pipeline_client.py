@@ -32,4 +32,4 @@ class PipelineClient:
             result_internal_config, InternalConfig
         ):
             raise ValueError("PipelineResult is either empty or not a InternalConfig.")
-        return internal_config
+        return result_internal_config

@@ -67,7 +67,7 @@ async def iterate_config() -> ResponseReturnValue:
 
 
 def _add_material_server_url(material_server_urls: list[str]) -> list[str]:
-    material_server_url = str(material_client.host) + ":" + str(material_client.port)
+    material_server_url = str(material_client.host)
     if len(material_server_urls) == 0:
         material_server_urls.append(material_server_url)
     else:
