@@ -18,18 +18,7 @@ class PipelineClient:
         service = PipelineServerStub(channel)
         last_pipeline_status: Optional[PipelineStatus] = None
         async for pipeline_status in service.iterate_config(internal_config):
-            print(pipeline_status)
+            print(pipeline_status, flush=True)
             last_pipeline_status = pipeline_status
         channel.close()
-        if last_pipeline_status is None or last_pipeline_status.result is None:
-            raise ValueError(
-                "No PipelineStatus was returned from the config iteration or PipelineResult is empty."
-            )
-        _, result_internal_config = betterproto.which_one_of(
-            last_pipeline_status.result, "pipeline_result"
-        )
-        if result_internal_config is None or not isinstance(
-            result_internal_config, InternalConfig
-        ):
-            raise ValueError("PipelineResult is either empty or not a InternalConfig.")
-        return result_internal_config
+        return last_pipeline_status

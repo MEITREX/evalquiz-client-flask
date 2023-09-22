@@ -8,4 +8,4 @@ RUN pip3 install gunicorn
 
 COPY .  .
 
-CMD gunicorn -b 0.0.0.0:8000 -w 4 evalquiz_client_flask.app:app
+CMD gunicorn -b 0.0.0.0:8000 -w 2 --threads 2 evalquiz_client_flask.app:app

@@ -59,11 +59,11 @@ async def iterate_config() -> ResponseReturnValue:
     internal_config.material_server_urls = _add_material_server_url(
         internal_config.material_server_urls
     )
-    iterated_internal_config = await pipeline_client.iterate_config(internal_config)
-    iterated_internal_config_json = iterated_internal_config.to_json(
+    pipeline_status = await pipeline_client.iterate_config(internal_config)
+    pipeline_status_json = pipeline_status.to_json(
         include_default_values=True, casing=Casing.SNAKE
     )
-    return iterated_internal_config_json
+    return pipeline_status_json
 
 
 def _add_material_server_url(material_server_urls: list[str]) -> list[str]:
