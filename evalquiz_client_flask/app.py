@@ -60,9 +60,7 @@ async def iterate_config() -> ResponseReturnValue:
         internal_config.material_server_urls
     )
     pipeline_status = await pipeline_client.iterate_config(internal_config)
-    pipeline_status_json = pipeline_status.to_json(
-        include_default_values=True, casing=Casing.SNAKE
-    )
+    pipeline_status_json = pipeline_status.to_json(casing=Casing.SNAKE)
     return pipeline_status_json
 
 

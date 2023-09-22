@@ -1,5 +1,4 @@
 from typing import Optional
-import betterproto
 from grpclib.client import Channel
 from evalquiz_proto.shared.generated import (
     InternalConfig,
@@ -13,7 +12,9 @@ class PipelineClient:
         self.host = host
         self.port = port
 
-    async def iterate_config(self, internal_config: InternalConfig) -> InternalConfig:
+    async def iterate_config(
+        self, internal_config: InternalConfig
+    ) -> Optional[PipelineStatus]:
         channel = Channel(host=self.host, port=self.port)
         service = PipelineServerStub(channel)
         last_pipeline_status: Optional[PipelineStatus] = None
