@@ -1,9 +1,7 @@
 name: Build and push to Azure Container Registry - EvalQuizClientFlask
 
 on:
-  push:
-    branches:
-      - deploy
+  workflow_dispatch:
 
 jobs:
   build:
